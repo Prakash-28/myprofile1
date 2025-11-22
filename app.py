@@ -66,10 +66,26 @@ def home():
 
 @app.route('/resume')
 def resume():
-    resume_path = os.path.join(os.path.dirname(__file__), 'docs', 'RESUME_PRAKASH V.pdf')
-    if os.path.exists(resume_path):
-        return send_file(resume_path, mimetype='application/pdf')
-    return "Resume not found", 404
+    # Try multiple possible locations
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    possible_paths = [
+        os.path.join(base_dir, 'docs', 'RESUME_PRAKASH V.pdf'),
+        os.path.join('/home/site/wwwroot', 'docs', 'RESUME_PRAKASH V.pdf'),
+        os.path.join(base_dir, '..', 'docs', 'RESUME_PRAKASH V.pdf')
+    ]
+    
+    for resume_path in possible_paths:
+        if os.path.exists(resume_path):
+            return send_file(resume_path, mimetype='application/pdf')
+    
+    # Debug info
+    error_msg = f"Resume not found. Tried paths: {possible_paths}<br>"
+    error_msg += f"Base dir: {base_dir}<br>"
+    error_msg += f"Files in base: {os.listdir(base_dir) if os.path.exists(base_dir) else 'N/A'}<br>"
+    docs_path = os.path.join(base_dir, 'docs')
+    if os.path.exists(docs_path):
+        error_msg += f"Files in docs: {os.listdir(docs_path)}"
+    return error_msg, 404
 
 if __name__ == '__main__':
     # Get port from environment variable (Azure assigns dynamic port)
