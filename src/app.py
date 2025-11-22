@@ -66,7 +66,11 @@ def home():
 
 @app.route('/resume')
 def resume():
+    # For local development in src folder, go up one level to find docs
     resume_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'docs', 'RESUME_PRAKASH V.pdf')
+    # For Azure deployment at root level
+    if not os.path.exists(resume_path):
+        resume_path = os.path.join(os.path.dirname(__file__), 'docs', 'RESUME_PRAKASH V.pdf')
     if os.path.exists(resume_path):
         return send_file(resume_path, mimetype='application/pdf')
     return "Resume not found", 404

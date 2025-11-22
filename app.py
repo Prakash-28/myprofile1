@@ -66,7 +66,7 @@ def home():
 
 @app.route('/resume')
 def resume():
-    resume_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'docs', 'RESUME_PRAKASH V.pdf')
+    resume_path = os.path.join(os.path.dirname(__file__), 'docs', 'RESUME_PRAKASH V.pdf')
     if os.path.exists(resume_path):
         return send_file(resume_path, mimetype='application/pdf')
     return "Resume not found", 404
