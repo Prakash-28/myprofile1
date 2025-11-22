@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile.name }} - Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="profile-header-content">
+                <div class="header-left">
+                    <img src="{{ url_for('static', filename='prakash.jpeg') }}" alt="{{ profile.name }}" class="profile-picture">
+                    <div class="header-text">
+                        <h1>{{ profile.name }}</h1>
+                        <p class="subtitle">{{ profile.title }}</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <h3 class="connect-title">Connect With Me</h3>
+                    <div class="header-social-links">
+                        <a href="{{ profile.social_links.github }}" target="_blank" class="header-social-link">
+                            <span>GitHub</span>
+                        </a>
+                        <a href="{{ profile.social_links.linkedin }}" target="_blank" class="header-social-link">
+                            <span>LinkedIn</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'profile')">Profile</button>
+            <button class="tab-button" onclick="openTab(event, 'resume')">Resume</button>
+        </div>
+
+        <div id="profile" class="tab-content active">
+            <section class="profile-section">
+                <h2>Contact Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Email:</span>
+                        <span>{{ profile.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Phone:</span>
+                        <span>{{ profile.phone }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Location:</span>
+                        <span>{{ profile.location }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="profile-section">
+                <h2>About Me</h2>
+                <p>{{ profile.summary }}</p>
+            </section>
+
+            <section class="profile-section">
+                <h2>Skills</h2>
+                <div class="skills-container">
+                    {% for skill in profile.skills %}
+                    <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="profile-section">
+                <h2>Experience</h2>
+                {% for exp in profile.experience %}
+                <div class="experience-item">
+                    <h3>{{ exp.title }}</h3>
+                    <p class="company">{{ exp.company }} | {{ exp.period }}</p>
+                    <p>{{ exp.description }}</p>
+                </div>
+                {% endfor %}
+            </section>
+
+            <section class="profile-section">
+                <h2>Key Projects</h2>
+                {% for project in profile.projects %}
+                <div class="project-item">
+                    <h3>{{ project.name }}</h3>
+                    <p>{{ project.description }}</p>
+                    <p class="technologies"><strong>Technologies:</strong> {{ project.technologies }}</p>
+                </div>
+                {% endfor %}
+            </section>
+
+            <section class="profile-section">
+                <h2>Education</h2>
+                {% for edu in profile.education %}
+                <div class="education-item">
+                    <h3>{{ edu.degree }}</h3>
+                    <p>{{ edu.institution }} | {{ edu.year }}</p>
+                </div>
+                {% endfor %}
+            </section>
+
+        </div>
+
+        <div id="resume" class="tab-content">
+            <div class="resume-container">
+                <h2>My Resume</h2>
+                <div class="zoom-controls">
+                    <button onclick="zoomOut()" class="zoom-btn">-</button>
+                    <span id="zoom-level">50%</span>
+                    <button onclick="zoomIn()" class="zoom-btn">+</button>
+                    <button onclick="resetZoom()" class="zoom-btn">Reset</button>
+                </div>
+                <div class="pdf-wrapper" id="pdfWrapper">
+                    <iframe src="{{ url_for('resume') }}" class="pdf-viewer" id="pdfViewer"></iframe>
+                </div>
+                <div class="download-section">
+                    <a href="{{ url_for('resume') }}" download class="download-btn">Download Resume</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentZoom = 0.5;
+
+        function openTab(evt, tabName) {
+            // Hide all tab contents
+            var tabContents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            // Remove active class from all buttons
+            var tabButtons = document.getElementsByClassName("tab-button");
+            for (var i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+
+            // Show the current tab and mark button as active
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function zoomIn() {
+            currentZoom += 0.25;
+            if (currentZoom > 3) currentZoom = 3;
+            updateZoom();
+        }
+
+        function zoomOut() {
+            currentZoom -= 0.25;
+            if (currentZoom < 0.5) currentZoom = 0.5;
+            updateZoom();
+        }
+
+        function resetZoom() {
+            currentZoom = 0.5;
+            updateZoom();
+        }
+
+        function updateZoom() {
+            const viewer = document.getElementById('pdfViewer');
+            viewer.style.transform = 'scale(' + currentZoom + ')';
+            viewer.style.transformOrigin = 'top center';
+            document.getElementById('zoom-level').textContent = Math.round(currentZoom * 100) + "%";
+            
+            // Adjust wrapper height based on zoom
+            const wrapper = document.getElementById('pdfWrapper');
+            wrapper.style.height = (1200 * currentZoom) + 'px';
+        }
+
+        // Set initial zoom when page loads
+        window.addEventListener('load', function() {
+            updateZoom();
+        });
+    </script>
+</body>
+</html>
